@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas - Hotel Javardo</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let reservas = []; // Lista de reservas
+
+        function calcularTotal() {
+            const precos = {
+                standard: 50,
+                deluxe: 100,
+                luxo: 250,
+                master: 400,
+                presidencial: 700
+            };
+
+            const quarto = $("#quarto").val();
+            const checkin = new Date($("#checkin").val());
+            const checkout = new Date($("#checkout").val());
+
+            if (checkin && checkout && checkout > checkin) {
+                const diffTime = Math.abs(checkout - checkin);
+                const diffDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                const total = precos[quarto] * diffDias;
+                $("#total").text(`Total: ${total}€ (${diffDias} noites)`);
+            } else {
+                $("#total").text("Total: --€");
+            }
+        }
+
+        function adicionarReserva(event) {
+            event.preventDefault(); // Impede o envio do formulário
+
+            const nome = $("#nome").val();
+            const email = $("#email").val();
+            const quarto = $("#quarto").val();
+            const checkin = $("#checkin").val();
+            const checkout = $("#checkout").val();
+
+            if (nome && email && quarto && checkin && checkout) {
+                // Adiciona a reserva ao array
+                reservas.push({ nome, email, quarto, checkin, checkout });
+                atualizarListaReservas();
+                alert("Reserva adicionada com sucesso!");
+                $("form").trigger("reset");
+                $("#total").text("Total: --€");
+            } else {
+                alert("Por favor, preencha todos os campos.");
+            }
+        }
+
+        function anularReserva(index) {
+            reservas.splice(index, 1); // Remove a reserva selecionada
+            atualizarListaReservas();
+            alert("Reserva anulada com sucesso!");
+        }
+
+        function atualizarListaReservas() {
+            const listaReservas = $("#listaReservas");
+            listaReservas.empty();
+
+            reservas.forEach((reserva, index) => {
+                const reservaItem = `
+                    <div class="reserva-item mb-3 p-3 bg-light rounded">
+                        <p><strong>Nome:</strong> ${reserva.nome}</p>
+                        <p><strong>Email:</strong> ${reserva.email}</p>
+                        <p><strong>Quarto:</strong> ${reserva.quarto}</p>
+                        <p><strong>Check-in:</strong> ${reserva.checkin}</p>
+                        <p><strong>Check-out:</strong> ${reserva.checkout}</p>
+                        <button class="btn btn-danger" onclick="anularReserva(${index})">Anular Reserva</button>
+                    </div>
+                `;
+                listaReservas.append(reservaItem);
+            });
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h2, p {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        form input, form select, form button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        .reservas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-primary text-white text-center py-4">
+        <h1>Reservas - Hotel Javardo</h1>
+    </header>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Hotel Javardo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="quartos.html">Quartos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="reservas.html">Reservas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestao.html">Gestão</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Reserve a tua Estadia</h2>
+        <p>Preencha o formulário abaixo para garantir sua reserva no Hotel Javardo.</p>
+
+        <form onsubmit="adicionarReserva(event)">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" id="nome" name="nome" class="form-control" placeholder="Nome completo" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+
+            <label for="quarto">Tipo de Quarto:</label>
+            <select id="quarto" name="quarto" class="form-select" onchange="calcularTotal()">
+                <option value="standard">Quarto Standard - 50€/noite</option>
+                <option value="deluxe">Quarto Deluxe - 100€/noite</option>
+                <option value="luxo">Suíte Luxo - 250€/noite</option>
+                <option value="master">Suíte Master - 400€/noite</option>
+                <option value="presidencial">Suíte Presidencial - 700€/noite</option>
+            </select>
+
+            <label for="checkin">Data de Check-in:</label>
+            <input type="date" id="checkin" name="checkin" class="form-control" required onchange="calcularTotal()" min="2025-01-01" max="2025-12-31">
+
+            <label for="checkout">Data de Check-out:</label>
+            <input type="date" id="checkout" name="checkout" class="form-control" required onchange="calcularTotal()" min="2025-01-01" max="2025-12-31">
+
+            <p id="total" class="fw-bold">Total: --€</p>
+
+            <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+        </form>
+
+        <div class="reservas">
+            <h2>Reservas Ativas</h2>
+            <div id="listaReservas"></div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2025 Hotel Javardo. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>
